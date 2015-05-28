@@ -564,17 +564,23 @@ class Q_learning(Learner):
 
     def learn(self, features, reward, action):
         self.loadFeatures(features, self.F)
+
         currentq = self.computeQ(action)
+        currentV = self.computeV()
 
         if self.lastS != None and self.lastAction != None: # if we're past the first step
-            delta = reward - self.lastQ
-            delta += self.rlGamma * currentq
+            delta = reward - self.lastV
+            delta += self.rlGamma * currentV
             amt = delta * (self.rlAlpha / self.numTilings)
+
+            max_action, max_value = max(enumerate(self.q_vals), key=operator.itemgetter(1))
 
             for i in self.traceH.getTraceIndices():
                 self.theta[i] += amt * self.traceH.getTrace(i)
+                if delta > 0:
+                    self.psi[i] = self.psi[i] + self.beta*(action-max_action)*
 
-            max_action, max_value = max(enumerate(self.q_vals), key=operator.itemgetter(1))
+
             if action == max_action:
                 self.traceH.decayTraces(self.rlGamma*self.rlLambda)
             else:
@@ -724,12 +730,14 @@ class Actor_Critic(Learner):
             for i in self.traceH.getTraceIndices():
                 self.theta[i] += amt * self.traceH.getTrace(i)
 
+
             max_action, max_value = max(enumerate(self.q_vals), key=operator.itemgetter(1))
             if action == max_action:
                 self.traceH.decayTraces(self.rlGamma*self.rlLambda)
             else:
                 self.traceH.decayTraces(0)
             self.traceH.replaceTraces(self.F[action])
+
 
         self.lastQ = currentq
         self.lastS = features
@@ -748,7 +756,6 @@ class Actor_Critic(Learner):
         for i in self.F[a]:
             q += self.theta[i]
         return q
-
 
 
 """
