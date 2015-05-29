@@ -403,6 +403,12 @@ class True_Online_TD2(TDLambdaLearner):
         self.verifier.updatePrediction(self.prediction)
 
 
+class lstd(Learner):
+
+    def __init__(self):
+        pass
+
+
 class SARSA(Learner):
 
 
@@ -503,7 +509,7 @@ class SARSA(Learner):
         return q
 
 
-class Q_learning(Learner):
+class qlearning(Learner):
 
 
     def __init__(actions, self, numTilings = 1, parameters = 2,rlAlpha = 0.5, rlLambda = 0.9,
@@ -578,7 +584,8 @@ class Q_learning(Learner):
             for i in self.traceH.getTraceIndices():
                 self.theta[i] += amt * self.traceH.getTrace(i)
                 if delta > 0:
-                    self.psi[i] = self.psi[i] + self.beta*(action-max_action)*
+                    pass
+                    #self.psi[i] = self.psi[i] + self.beta*(action-max_action)*
 
 
             if action == max_action:
@@ -614,6 +621,12 @@ class Q_learning(Learner):
         for i in self.F[a]:
             q += self.theta[i]
         return q
+
+
+class lstdQ(Learner):
+
+    def __init__(self):
+        pass
 
 
 class SwitchingLearner_bento(Learner):
@@ -655,6 +668,16 @@ class SwitchingLearner_bento(Learner):
     def loss(self):
         raise Exception("NOT IMPLEMENTED -- NOT USED")
 
+
+class Actor_Critic(Learner):
+
+    def __init__(self):
+        actor = TDLambdaLearner()
+        critic = SARSA()
+
+'''
+
+    Bad code is bad
 
 class Actor_Critic(Learner):
 
@@ -756,7 +779,7 @@ class Actor_Critic(Learner):
         for i in self.F[a]:
             q += self.theta[i]
         return q
-
+'''
 
 """
 ****************************************************************
