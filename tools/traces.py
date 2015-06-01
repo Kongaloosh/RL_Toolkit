@@ -56,7 +56,7 @@ class SimpleTraceHolder:
             
     def addToTrace (self, f, newValue):
         "Add the new value to the trace for feature f"
-        self.E[f] += newTraceValue
+        self.E[f] += newValue
         
     def getTraceIndices (self):
         "Gives a list of trace indexes"
