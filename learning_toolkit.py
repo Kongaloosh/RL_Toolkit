@@ -333,7 +333,7 @@ class TDLambdaLearner(Learner):
         return self.computeQ()
 
 
-class True_Online_TD2(TDLambdaLearner):
+class trueOnlineTD(TDLambdaLearner):
     """
         True online TD implementation
             * Has Dutch traces
@@ -351,6 +351,7 @@ class True_Online_TD2(TDLambdaLearner):
         self.lastQ = None
         self.lastPrediction = None
         self.lastReward = None
+        self.delta = None
         self.F = [0 for item in range(self.numTilings)]
         self.F2 = [0 for item in range(self.numTilings)]
         self.theta = [0 for item in range((self.numTilings**(self.parameters+1))+1)]
@@ -373,7 +374,7 @@ class True_Online_TD2(TDLambdaLearner):
             self.currentq += self.theta[i] 
         
         if self.lastS != None:
-            delta = reward + self.rlGamma * self.currentq - self.lastQ # create delta
+            self.delta = reward + self.rlGamma * self.currentq - self.lastQ # create delta
             
             self.loadFeatures(self.lastS, self.F2) 
             lastQ_2 = 0
@@ -393,7 +394,7 @@ class True_Online_TD2(TDLambdaLearner):
                 self.theta[i] += self.rlAlpha*(self.lastQ - lastQ_2)
                 
             for i in range(len(self.theta)):
-                self.theta[i] += delta*self.e[i]
+                self.theta[i] += self.delta*self.e[i]
                 
         self.lastQ = self.currentq
         self.lastS = state
@@ -403,13 +404,8 @@ class True_Online_TD2(TDLambdaLearner):
         self.verifier.updatePrediction(self.prediction)
 
 
-class lstd(Learner):
 
-    def __init__(self):
-        pass
-
-
-class SARSA(Learner):
+class sarsa(Learner):
 
 
     def __init__(actions, self, numTilings = 1, parameters = 2,rlAlpha = 0.5, rlLambda = 0.9,
@@ -500,6 +496,7 @@ class SARSA(Learner):
                floats                  ; a list of real values making up the input vector
                ints)                   ; list of optional inputs to get different hashings
         """
+
 
     def computeQ (self, a):
         "compute value of action for current F and theta"
@@ -629,6 +626,37 @@ class lstdQ(Learner):
         pass
 
 
+class actor_critic(Learner):
+
+    def __init__(self):
+        self.td = TDLambdaLearner()
+
+
+    def update(self, features, target=None):
+
+        self.td.update(features,target)
+        self.td
+
+        self.chooseAction(features)
+
+        self.learn(features, )
+
+    def chooseAction(self, features):
+        for action in range(self.actions):
+            self.loadFeatures(featureVector=self.F[action], stateVars=features)
+            self.q_vals[action] = self.computeQ(action)
+        return self.eGreedy()
+
+
+    def eGreedy(self):
+        if random.random() < self.rlEpsilon:
+            return random.randrange(self.actions) # random action
+        else:
+            max_index, max_value = max(enumerate(self.q_vals), key=operator.itemgetter(1))
+            return max_index # best action
+
+
+
 class SwitchingLearner_bento(Learner):
 
 
@@ -668,12 +696,6 @@ class SwitchingLearner_bento(Learner):
     def loss(self):
         raise Exception("NOT IMPLEMENTED -- NOT USED")
 
-
-class Actor_Critic(Learner):
-
-    def __init__(self):
-        actor = TDLambdaLearner()
-        critic = SARSA()
 
 '''
 
